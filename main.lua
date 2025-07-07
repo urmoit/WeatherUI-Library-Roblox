@@ -1,8 +1,8 @@
--- WindUI - A Modern Roblox UI Library
+-- WeatherUI - A Modern Roblox UI Library
 -- Version: 1.0.0
--- GitHub: https://github.com/Footagesus/WindUI
+-- GitHub: https://github.com/Footagesus/WeatherUI
 
-local WindUI = {
+local WeatherUI = {
     Version = "1.0.0",
     Themes = {
         Dark = {
@@ -33,14 +33,14 @@ local LocalPlayer = Players.LocalPlayer
 local Mouse = LocalPlayer:GetMouse()
 
 -- Create main UI container
-local WindUIInstance = Instance.new("ScreenGui")
-WindUIInstance.Name = "WindUI"
-WindUIInstance.ResetOnSpawn = false
-WindUIInstance.ZIndexBehavior = Enum.ZIndexBehavior.Sibling
-WindUIInstance.Parent = CoreGui
+local WeatherUIInstance = Instance.new("ScreenGui")
+WeatherUIInstance.Name = "WeatherUI"
+WeatherUIInstance.ResetOnSpawn = false
+WeatherUIInstance.ZIndexBehavior = Enum.ZIndexBehavior.Sibling
+WeatherUIInstance.Parent = CoreGui
 
 -- Main window creation function
-function WindUI:CreateWindow(options)
+function WeatherUI:CreateWindow(options)
     local window = {
         Tabs = {},
         CurrentTab = nil,
@@ -54,7 +54,7 @@ function WindUI:CreateWindow(options)
     mainFrame.Position = UDim2.new(0.5, -250, 0.5, -200)
     mainFrame.BackgroundColor3 = window.Theme.Main
     mainFrame.BorderColor3 = window.Theme.Border
-    mainFrame.Parent = WindUIInstance
+    mainFrame.Parent = WeatherUIInstance
     
     -- Add title bar
     local titleBar = Instance.new("Frame")
@@ -66,7 +66,7 @@ function WindUI:CreateWindow(options)
     
     local titleText = Instance.new("TextLabel")
     titleText.Name = "Title"
-    titleText.Text = options.Title or "WindUI Window"
+    titleText.Text = options.Title or "WeatherUI Window"
     titleText.Size = UDim2.new(1, -60, 1, 0)
     titleText.Position = UDim2.new(0, 10, 0, 0)
     titleText.TextColor3 = window.Theme.Text
@@ -610,4 +610,4 @@ function WindUI:CreateWindow(options)
     return window
 end
 
-return WindUI
+return WeatherUI
