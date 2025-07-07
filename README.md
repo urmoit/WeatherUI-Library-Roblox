@@ -1,12 +1,13 @@
-# WindUI - Modern Roblox UI Library
+# WeatherUI - Roblox UI Library with Weather Themes
 
-![WindUI Preview](preview.png)
+![WeatherUI Preview](preview.png)
 
-A sleek, modern UI library for Roblox with easy-to-use components and smooth animations.
+A dynamic UI library for Roblox with weather-themed interfaces and effects.
 
 ## Features
 
-- 🎨 Customizable themes (Dark/Light)
+- ⛅ Three weather themes: Sunny, Rainy, and Stormy
+- 🌧️ Animated weather effects
 - 🖱️ Draggable windows
 - 📑 Tabbed interface
 - 🏷️ Organized sections
@@ -18,7 +19,7 @@ A sleek, modern UI library for Roblox with easy-to-use components and smooth ani
 
 ## Installation
 
-Add WindUI to your Roblox game with one line:
+Add WeatherUI to your Roblox game with one line:
 
 ```lua
-local WindUI = loadstring(game:HttpGet("https://raw.githubusercontent.com/Footagesus/WindUI/main/main.lua"))()
+local WeatherUI = loadstring(game:HttpGet("https://raw.githubusercontent.com/urmoit/WeatherUI-Library-Roblox/refs/heads/main/main.lua"))()
