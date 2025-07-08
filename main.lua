@@ -1,3 +1,28 @@
+--!native
+--!optimize 2
+
+local game = game
+local GetService = game.GetService
+
+cloneref = cloneref or function(...)
+    return ...
+end
+
+local TweenService = GetService(game, "TweenService")
+local UserInputService = GetService(game, "UserInputService")
+local RunService = GetService(game, "RunService")
+local Players = GetService(game, "Players")
+local CoreGui = cloneref(GetService(game, "CoreGui"))
+local Player = Players.LocalPlayer
+local Mouse = Player:GetMouse()
+
+local IsOnMobile = table.find({
+    Enum.Platform.IOS,
+    Enum.Platform.Android
+}, UserInputService:GetPlatform())
+
+local IsOnEmulator = IsOnMobile and UserInputService.KeyboardEnabled
+
 local WeatherUI = {
     Version = "1.0.0",
     Themes = {
@@ -18,27 +43,65 @@ local WeatherUI = {
     }
 }
 
--- Internal services
-local TweenService = game:GetService("TweenService")
-local UserInputService = game:GetService("UserInputService")
-local RunService = game:GetService("RunService")
-local Players = game:GetService("Players")
-local CoreGui = game:GetService("CoreGui")
+local function GenerateString()
+    local Charset = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789"
+    local Result = ""
+    for I = 1, 12 do
+        local RandIndex = math.random(1, #Charset)
+        Result = Result .. Charset:sub(RandIndex, RandIndex)
+    end
+    return Result
+end
+
+function WeatherUI:DragFunc(g, h)
+    h = h or g
+    local dragging = false
+    local dragStart, frameStart
+    
+    g.InputBegan:Connect(function(input)
+        if input.UserInputType == Enum.UserInputType.MouseButton1 or input.UserInputType == Enum.UserInputType.Touch then
+            dragging = true
+            dragStart = input.Position
+            frameStart = h.Position
+            input.Changed:Connect(function()
+                if input.UserInputState == Enum.UserInputState.End then
+                    dragging = false
+                end
+            end)
+        end
+    end)
+    
+    UserInputService.InputChanged:Connect(function(input)
+        if dragging and (input.UserInputType == Enum.UserInputType.MouseMovement or input.UserInputType == Enum.UserInputType.Touch) then
+            local delta = input.Position - dragStart
+            h.Position = UDim2.new(frameStart.X.Scale, frameStart.X.Offset + delta.X, frameStart.Y.Scale, frameStart.Y.Offset + delta.Y)
+        end
+    end)
+end
 
 -- Main UI container
 local WeatherUIInstance = Instance.new("ScreenGui")
-WeatherUIInstance.Name = "WeatherUI_"..tostring(math.random(1, 10000))
+WeatherUIInstance.Name = "WeatherUI_"..GenerateString()
 WeatherUIInstance.ResetOnSpawn = false
 WeatherUIInstance.ZIndexBehavior = Enum.ZIndexBehavior.Sibling
 WeatherUIInstance.Parent = CoreGui
 
--- Main window creation
+if gethui then
+    WeatherUIInstance.Parent = gethui()
+elseif CoreGui:FindFirstChild("RobloxGui") then
+    WeatherUIInstance.Parent = CoreGui:FindFirstChild("RobloxGui")
+end
+
+function WeatherUI:ToggleUI(State)
+    if self.MainWindow then
+        self.MainWindow.Visible = State or not self.MainWindow.Visible
+    end
+end
+
 function WeatherUI:CreateWindow(options)
-    -- Validate options
     options = options or {}
     local theme = options.Theme or self.Themes.Dark
     
-    -- Create window instance
     local window = {
         Tabs = {},
         CurrentTab = nil,
@@ -114,29 +177,7 @@ function WeatherUI:CreateWindow(options)
     contentContainer.Parent = mainFrame
     
     -- Dragging functionality
-    local dragging = false
-    local dragStart, frameStart
-    
-    titleBar.InputBegan:Connect(function(input)
-        if input.UserInputType == Enum.UserInputType.MouseButton1 then
-            dragging = true
-            dragStart = input.Position
-            frameStart = mainFrame.Position
-        end
-    end)
-    
-    titleBar.InputEnded:Connect(function(input)
-        if input.UserInputType == Enum.UserInputType.MouseButton1 then
-            dragging = false
-        end
-    end)
-    
-    UserInputService.InputChanged:Connect(function(input)
-        if dragging and input.UserInputType == Enum.UserInputType.MouseMovement then
-            local delta = input.Position - dragStart
-            mainFrame.Position = UDim2.new(frameStart.X.Scale, frameStart.X.Offset + delta.X, frameStart.Y.Scale, frameStart.Y.Offset + delta.Y)
-        end
-    end)
+    self:DragFunc(titleBar, mainFrame)
     
     -- Tab creation
     function window:CreateTab(name)
@@ -602,6 +643,27 @@ function WeatherUI:CreateWindow(options)
     end
     
     window.Instance = mainFrame
+    self.MainWindow = mainFrame
+    
+    if IsOnMobile and not IsOnEmulator then
+        local mobileButton = Instance.new("TextButton")
+        mobileButton.Name = "MobileToggle"
+        mobileButton.Size = UDim2.new(0, 50, 0, 50)
+        mobileButton.Position = UDim2.new(0, 20, 0.5, -25)
+        mobileButton.BackgroundColor3 = theme.Accent
+        mobileButton.TextColor3 = theme.Text
+        mobileButton.Text = "☰"
+        mobileButton.Font = Enum.Font.GothamBold
+        mobileButton.TextSize = 24
+        mobileButton.Parent = WeatherUIInstance
+        
+        mobileButton.MouseButton1Click:Connect(function()
+            self:ToggleUI()
+        end)
+        
+        self:DragFunc(mobileButton)
+    end
+    
     return window
 end
 
